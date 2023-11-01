@@ -113,3 +113,5 @@ torch.abs(u).sum() # L1 norm
 # %%
 torch.norm(torch.ones((4, 9))) # Frobenius norm
 # %%
+# Frobenius norm is elementwise square, then sum and square root
+# L2 norm is vector wise 
