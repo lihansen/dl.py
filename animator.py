@@ -5,9 +5,12 @@ from IPython import display
 
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
-    axes.set_xlabel(xlabel), axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale), axes.set_yscale(yscale)
-    axes.set_xlim(xlim),     axes.set_ylim(ylim)
+    axes.set_xlabel(xlabel)
+    axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale)
+    axes.set_yscale(yscale)
+    axes.set_xlim(xlim),
+    axes.set_ylim(ylim)
     if legend:
         axes.legend(legend)
     axes.grid()
@@ -24,15 +27,16 @@ class Animator:
                  fmts=('-', 'm--', 'g-.', 'r:'),
                  nrows=1,
                  ncols=1,
-                 figsize=(3.5, 2.5)) -> None:
+                 figsize=(3.5, 2.5)):
 
-        if legend is None: # legend
+        if legend is None:  # legend
             legend = []
 
         # set svg display
         backend_inline.set_matplotlib_formats("svg")
 
-        self.fig, self.axes = plt.subplots(nrows, ncols, figsize=figsize)
+        self.fig, self.axes = plt.subplots(
+            nrows, ncols, figsize=figsize)  # subplots
 
         if nrows * ncols == 1:
             self.axes = [self.axes, ]
@@ -44,6 +48,7 @@ class Animator:
         self.X, self.Y, self.fmts = None, None, fmts
 
     def add(self, x, y):
+        # print(x, y)
         if not hasattr(y, "__len__"):
             y = [y]
 
@@ -70,5 +75,5 @@ class Animator:
 
         self.config_axes()
 
-        display.display(self)
+        display.display(self.fig)
         display.clear_output(wait=True)
