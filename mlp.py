@@ -1,8 +1,8 @@
 # %% 
 import torch 
 from torch import nn
-from load_fshnmnist import load_data
-from training import train_ch3, train
+from utils.load_fshnmnist import load_data
+from training import train_ch3, train, cal_acc
 from d2l import torch as d2l 
 
 def gpu():
@@ -28,7 +28,7 @@ net.apply(init_weights)
 # %%
 batch_size = 265
 lr = .1
-n_epochs = 40
+n_epochs = 20
 loss = nn.CrossEntropyLoss(reduction="none")
 
 trainer = torch.optim.SGD(net.parameters(), lr = lr)
@@ -42,7 +42,13 @@ train_iter, test_iter = load_data(batch_size)
 
 
 # %%
-# net.parameters()
+
 # train_ch3(net, train_iter, test_iter, loss, n_epochs, trainer)
 # %%
 train(net, train_iter, loss, n_epochs, trainer)
+
+# net.state_dict
+
+# %%
+acc = cal_acc(net, test_iter)
+acc

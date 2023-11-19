@@ -3,19 +3,6 @@ from matplotlib_inline import backend_inline
 from IPython import display
 
 
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
-    """Set the axes for matplotlib."""
-    axes.set_xlabel(xlabel)
-    axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale)
-    axes.set_yscale(yscale)
-    axes.set_xlim(xlim),
-    axes.set_ylim(ylim)
-    if legend:
-        axes.legend(legend)
-    axes.grid()
-
-
 class Animator:
     def __init__(self, xlabel=None,
                  ylabel=None,
@@ -24,36 +11,68 @@ class Animator:
                  ylim=None,
                  xscale="linear",
                  yscale="linear",
-                 fmts=('-', 'm--', 'g-.', 'r:'),
+                 title=None,
+                 fmts=('-', 'm--', 'g-.', 'r:'), # line styles
                  nrows=1,
                  ncols=1,
                  figsize=(3.5, 2.5)):
-
-        if legend is None:  # legend
+        
+        # set legends
+        if legend is None:  
             legend = []
 
         # set svg display
         backend_inline.set_matplotlib_formats("svg")
 
-        self.fig, self.axes = plt.subplots(
-            nrows, ncols, figsize=figsize)  # subplots
+        # set figure and axes
+        self.fig, self.axes = plt.subplots(nrows, ncols, figsize=figsize)  
 
+        # convert axes to list
         if nrows * ncols == 1:
             self.axes = [self.axes, ]
 
-        self.config_axes = lambda: set_axes(
-            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend
-        )
+        # set attributes
+        self.xlabel = xlabel
+        self.ylabel = ylabel
+        self.xlim = xlim
+        self.ylim = ylim
+        self.xscale = xscale
+        self.yscale = yscale
+        self.title = title
+        self.legend = legend
 
         self.X, self.Y, self.fmts = None, None, fmts
+    
+
+    def config_axes(self, axes):
+        """Set the axes for matplotlib."""
+        axes.set_xlabel(self.xlabel)
+        axes.set_ylabel(self.ylabel)
+        axes.set_xscale(self.xscale)
+        axes.set_yscale(self.yscale)
+        axes.set_xlim(self.xlim),
+        axes.set_ylim(self.ylim)
+        
+        if self.title:
+            axes.set_title(self.title + "..")
+        if self.legend:
+            axes.legend(self.legend)
+
+        axes.grid()
 
     def add(self, x, y):
-        # print(x, y)
-        if not hasattr(y, "__len__"):
+        """
+        Add multiple data points into the figure.
+        x: scalar or list
+        y: scalar or list
+        """
+        # convert y to list
+        if not hasattr(y, "__len__"): 
             y = [y]
 
         n = len(y)
 
+        # convert x to list
         if not hasattr(x, "__len__"):
             x = [x] * n
 
@@ -73,7 +92,7 @@ class Animator:
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
             self.axes[0].plot(x, y, fmt)
 
-        self.config_axes()
+        self.config_axes(self.axes[0])
 
         display.display(self.fig)
         display.clear_output(wait=True)

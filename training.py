@@ -1,5 +1,5 @@
 import torch
-from animator import Animator
+from utils.Animator import Animator
 
 class Accumulator:
     def __init__(self, n_vars) -> None:
@@ -14,6 +14,8 @@ class Accumulator:
     def __getitem__(self, idx):
         return self.data[idx]
 
+def cuda():
+    return torch.device("cuda")
 
 
 def evaluate_accuracy(net, data_iter):  # @save
@@ -28,14 +30,33 @@ def evaluate_accuracy(net, data_iter):  # @save
             metric.add(accuracy(net(X), y), y.numel())
     return metric[0] / metric[1]
 
-
-
 def accuracy(outputs, labels):  # @save
     """计算预测正确的数量"""
     if len(outputs.shape) > 1 and outputs.shape[1] > 1:
         outputs = outputs.argmax(axis=1)
     cmp = outputs.type(labels.dtype) == labels
     return float(cmp.type(labels.dtype).sum())
+
+
+
+def cal_acc(net, test_iter):
+    net.eval()
+    
+    total_acc = 0
+    
+    with torch.no_grad():
+        for x, labels in test_iter:
+            x = x.to(cuda())
+            labels = labels.to(cuda())
+
+            outputs = net(x)
+            batch_acc = accuracy(outputs, labels)
+            total_acc += batch_acc
+
+    
+    return total_acc / len(test_iter.dataset)
+
+
 
 
 def train_epoch_ch3(net, train_iter, loss, updater):  # @save
@@ -88,7 +109,7 @@ def cuda():
 def train(net, train_iter, criterion, n_epochs, updater):
     animator = Animator(xlabel='epoch', 
                         xlim=[1, n_epochs], 
-                        ylim=[0.3, 0.9],
+                        ylim=[0.1, 0.9],
                         legend=['avg loss', "running loss"])
     for epoch in range(n_epochs):
         total_loss = 0.
@@ -97,8 +118,7 @@ def train(net, train_iter, criterion, n_epochs, updater):
         for i, data in enumerate(train_iter):
             x = data[0].to(device=cuda())
             labels = data[1].to(device=cuda())
-            # print(x.shape, labels.shape)
-            # break
+
             outputs = net(x)
             loss = criterion(outputs, labels)
 
@@ -110,11 +130,9 @@ def train(net, train_iter, criterion, n_epochs, updater):
             total_sample +=  labels.numel()
             avg_loss = total_loss / total_sample
             running_loss = float(loss.sum()) / labels.numel()
-            # print(labels.shape)
-            # break
-            # print(running_loss.shape)
+
+
         animator.add(epoch + 1, [avg_loss, running_loss])
-            # if i % 2000 == 1999:    # print every 2000 mini-batches
         # print(f'[{epoch + 1}] loss: {running_loss:.3f}', x.shape)
-        # break
-                # running_loss = 0.0
+
+
