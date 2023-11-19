@@ -43,6 +43,12 @@ for layer in alexnet:
     x = layer(x)
     print(layer.__class__.__name__,'output shape:\t', x.shape)
 
+    
+# %%
+total_params = 0
+for p in alexnet.parameters():
+    total_params += p.numel()
+    print(total_params, p.shape)
 
 # %%
 batch_size = 128
@@ -67,3 +73,5 @@ for w in weights:
     print(w)
 # %%
 print(alexnet)
+
+# %%

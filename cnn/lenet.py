@@ -61,6 +61,13 @@ print(lenet)
 # lenet.train()
 
 # %%
+total_params = 0
+for p in lenet.parameters():
+    total_params += p.numel()
+    print(total_params, p.shape)
+
+
+# %%
 
 # sequential defined lenet model
 lenet_seq = nn.Sequential(
