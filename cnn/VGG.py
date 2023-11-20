@@ -8,7 +8,6 @@ sys.path.append('..')
 from utils.load_fshnmnist import load_data
 # %%
 
-
 def VGG_block(num_convs, in_channels, out_channels):
     layers = []
     for i in range(num_convs):
@@ -22,7 +21,6 @@ def VGG_block(num_convs, in_channels, out_channels):
     return nn.Sequential(*layers)
 
 # %%
-
 
 def VGG(conv_arch):
     conv_blks = []
@@ -71,17 +69,26 @@ ratio = 4
 
 small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
 small_vgg = VGG(small_conv_arch)
+
+
 # %%
 total_params = 0
 for p in small_vgg.parameters():
     total_params += p.numel()
     print(total_params, p.shape)
+
+
 # %%
 lr, num_epochs, batch_size = 0.05, 10, 128
 train_iter, test_iter = load_data(batch_size, resize=224)
 d2l.train_ch6(small_vgg, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+
+
 # %%
 lr, num_epochs, batch_size = 0.05, 10, 128
 train_iter, test_iter = load_data(batch_size, resize=224)
 d2l.train_ch6(vgg, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+
+
+
 # %%
